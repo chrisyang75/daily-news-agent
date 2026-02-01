@@ -3,7 +3,7 @@ name: Daily News Agent
 on:
   schedule:
     - cron: '0 0 * * *' # 한국 시간 오전 9시 정각
-  workflow_dispatch: # 수동 실행 버튼 생성
+  workflow_dispatch: # 지금 바로 실행 버튼
 
 jobs:
   run-agent:
@@ -15,7 +15,8 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install libraries
-        run: pip install python-telegram-bot
+        # 이 부분이 핵심입니다! 뉴스 검색 도구(requests, bs4)를 설치하라는 명령입니다.
+        run: pip install python-telegram-bot requests beautifulsoup4
       - name: Send Message
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
