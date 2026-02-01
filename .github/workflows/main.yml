@@ -1,24 +1,39 @@
-name: Daily News Agent
+import os
+import asyncio
+import telegram
 
-on:
-  schedule:
-    # 한국 시간 기준 오전 9시 정각 (세계 표준시 00시)
-    - cron: '0 0 * * *'
-  workflow_dispatch: # 지금 바로 실행 버튼을 만들어줍니다
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+CHAT_ID = os.environ.get('CHAT_ID')
 
-jobs:
-  run-agent:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Install libraries
-        run: pip install python-telegram-bot
-      - name: Send Message
-        env:
-          BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python main.py
+async def send_daily_report():
+    bot = telegram.Bot(token=BOT_TOKEN)
+    
+    # 대표님이 원하시는 상세 형식으로 채웠습니다.
+    report_text = """
+*📅 2026.02.01 산업 데일리 리포트*
+
+---
+*## PART 1. 디스플레이(Display) 뉴스*
+*1. [중국] BOE 청두 B16 라인 가동 및 출하 성공*
+- 예상보다 5개월 앞당겨 운영 단계 진입
+- [현장 사진 및 기사 확인](https://www.kdia.org/bbs/bbsView.jsp?mgrId=40&bbsId=16895)
+
+---
+*## PART 2. 반도체 TGV 및 유리 기판 뉴스*
+*1. [삼성] 필옵틱스·켐트로닉스 TGV 밸류체인 강화*
+- 레이저 타공 및 식각 공정 수율 확보 총력
+- [기술 상세 사진 및 기사 확인](https://biz.chosun.com/it-science/ict/2026/01/16/UCZ63LS4DNGE7FPUJLSQUK7KBE/)
+
+*2. [LG] 아바텍, 서버용 유리 기판 코팅 소재 공동 특허*
+- LG이노텍과 협력하여 유리 기판 내구성 강화
+- [협약 현장 사진 및 기사 확인](https://biz.chosun.com/it-science/ict/2026/01/08/SLDRXGTHFRFNRIJC3XHY3VEKSA/)
+
+---
+*💡 오늘의 인사이트*
+"BOE의 조기 가동으로 IT용 OLED 시장의 시계가 빨라졌습니다. TGV 시장은 현재 수율을 먼저 잡는 협력사가 삼성·LG 공급망의 핵심이 될 것입니다."
+"""
+    
+    await bot.send_message(chat_id=CHAT_ID, text=report_text, parse_mode='Markdown')
+
+if __name__ == "__main__":
+    asyncio.run(send_daily_report())
